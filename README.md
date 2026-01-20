@@ -1,6 +1,6 @@
 # BIM-IFC Viewer
 
-Try it out: [https://extraordinary-belekoy-ee7fa8.netlify.app](https://extraordinary-belekoy-ee7fa8.netlify.app)
+Try it out: https://ifcview-vinay.netlify.app/
 
 ## Key Features
 
