@@ -1,141 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="static/favicon.ico">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load the `mapbox-gl-geocoder` plugin. -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="static/colorjoe.min.js"></script>
-    <link rel="stylesheet" href="static/colorjoe.css">
-    <title>BIM model viewer with GIS</title>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="static/favicon.ico" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Mapbox -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Mapbox Geocoder (remove if unused in viewer.js) -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet"/>
+
+  <!-- Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
+  <!-- Color Picker -->
+  <script src="static/colorjoe.min.js"></script>
+  <link rel="stylesheet" href="static/colorjoe.css"/>
+
+  <link rel="stylesheet" href="styles.css" />
+  <title>BIM model viewer with GIS</title>
 </head>
-<body>
-    <div class="relative w-screen h-screen" id="viewer-container"></div>
 
-    <div class="hidden absolute top-0 left-0 w-screen h-screen z-50 flex justify-center items-center bg-neutral-500 bg-opacity-50" id="progress-container">
-      <div class="p-2 bg-white rounded-xl shadow-xl flex flex-col justify-center items-center gap-2 text-2xl">
-        <div class="flex justify-center items-center gap-2">
-          <p id="progress-label"></p>
-          <p id="progress-text"></p>
-        </div>
-        <img src ="static/loading.svg" alt="Loading IFC.js..."/>
-      </div>
+<body class="overflow-hidden">
+
+<!-- Viewer -->
+<div id="viewer-container" class="relative w-screen h-screen"></div>
+
+<!-- Loading Overlay -->
+<div id="progress-container"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-neutral-500/80">
+  <div class="p-4 rounded-xl shadow-xl bg-white flex flex-col items-center gap-2 text-sm">
+    <div class="flex gap-2">
+      <p id="progress-label"></p>
+      <p id="progress-text"></p>
     </div>
+    <img src="static/spinner.svg" class="w-10 h-10" alt="Loading IFC.js"/>
+  </div>
+</div>
 
-    <div class="absolute top-2 left-2 z-10 flex flex-col items-start gap-2">
-      <div class="flex flex-col items-start gap-2 p-2 bg-white rounded-xl shadow-xl">
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-center items-center gap-2 disabled:bg-blue-300" id="sample-button">
-          <span class="material-icons material-symbols-outlined">
-              home
-          </span>
-          Open sample model
-        </button>
-        <div class="w-full text-center">OR</div>
-        <input class="hidden" type="file" id="file-input">
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-center items-center gap-2 disabled:bg-blue-300" id="save-button">
-          <span class="material-icons material-symbols-outlined">
-              upload_file
-          </span>
-          Upload model
-        </button>
-        <button class="px-4 py-2 bg-red-500 text-white rounded-xl shadow-xl flex justify-center items-center gap-2 disabled:bg-red-300" id="remove-button">
-          <span class="material-icons material-symbols-outlined">
-              delete
-          </span>
-          Remove cached model
-        </button>
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-center items-center gap-2 disabled:bg-blue-300" id="dim-button">
-          <span class="material-icons material-symbols-outlined">
-            straighten
-          </span>
-          Dimension
-        </button>
-        <button class="w-full bg-blue-500 disabled:bg-blue-300 rounded-xl shadow-xl disabled:pointer-events-none" id="map-button">
-          <a class="w-full px-4 py-2 text-white flex justify-center items-center gap-2" href='gis.html'>
-              <span class="material-icons material-symbols-outlined">
-                travel_explore
-              </span>
-              3D map viewer
-          </a>
-        </button>
-        <button class="w-full px-4 py-2 bg-blue-500 text-white rounded-xl shadow-xl flex justify-center items-center gap-2 disabled:bg-blue-300" id="guide-button">
-            <span class="material-icons material-symbols-outlined">
-              help
-            </span>
-            Keyboard guide
-          </a>
-        </button>
-      </div>
-      <div class="hidden flex flex-col items-start gap-2 p-2 bg-white rounded-xl shadow-xl" id="guide-container">
-        <table class="table-fixed">
-          <thead>
-            <tr>
-              <th colspan="2">
-                How to use:
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Add a clipping plane: </td>
-              <td>Click an element and press 'P'</td>
-            </tr>
-            <tr>
-              <td>Remove a clipping plane: </td>
-              <td>Select a clipping arrow and press 'O'</td>
-            </tr>
-            <tr>
-              <td>Take measurement: </td>
-              <td>1. Press 'Dimension' <br/> 2. Double click the starting point. To choose another point, press 'Esc' to cancel<br/> 3. Click the endpoint</td>
-            </tr>
-            <tr>
-              <td>Remove measurement label: </td>
-              <td>Select a measurement label and press 'Del'</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+<!-- Hamburger Menu -->
+<div class="absolute top-2 left-2 z-30">
 
-    <div class="absolute top-2 right-2 z-10 flex flex-col items-end gap-2">
-      <div class="hidden p-2 bg-white rounded-xl shadow-xl w-fit" id="palette-container">
-        <div class="colorjoe"></div>
-      </div>
-      <div class="hidden p-2 bg-white rounded-xl shadow-xl max-w-[50vh] max-h-[50vh] overflow-y-scroll" id="properties-container"></div>
-    </div>
+  <!-- Toggle Button -->
+  <button id="hamburger-toggle"
+          aria-label="Open menu"
+          class="p-2 bg-white/80 backdrop-blur-md rounded-xl shadow-xl">
+    <span class="material-icons text-3xl">menu</span>
+  </button>
 
-    <button class="fixed right-2 bottom-24 z-10 p-4 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center" id="palette-button">
-      <span class="material-icons material-icons-outlined">
-        palette
-      </span>
+  <!-- Panel -->
+  <div id="hamburger-panel"
+       class="hidden mt-2 p-2 flex flex-col gap-1 bg-white/80 backdrop-blur-md rounded-xl shadow-xl">
+
+    <button id="sample-button" class="sample-btn flex gap-2 items-center">
+      <span class="material-icons">home</span> Open sample model
     </button>
 
-    <button class="fixed right-2 bottom-8 z-10 p-4 bg-blue-500 text-white rounded-full shadow-xl flex items-center justify-center">
-      <a class="flex items-center justify-center" href="https://github.com/helenkwok/bim-gis-viewer" target="_blank">
-        <span class="material-icons material-icons-outlined">
-          code
-        </span>
-      </a>
+    <input type="file" id="file-input" class="hidden"/>
+
+    <button id="save-button" class="sample-btn flex gap-2 items-center">
+      <span class="material-icons">upload_file</span> Upload model
     </button>
 
-    <footer class="fixed w-screen bottom-0 flex items-center justify-center z-10 pointer-events-none">
-        <div class="px-2 bg-neutral-200 bg-opacity-50">
-            Built with <a class="pointer-events-auto underline font-bold" href="https://ifcjs.github.io/info" target="_blank">
-              IFC.js
-          </a> and ❤ by <a class="pointer-events-auto underline font-bold text-xs lg:text-base" href="https://github.com/helenkwok" target="_blank">
-                Helen Kwok
-            </a> © 2022
-        </div>
-    </footer>
+    <button id="remove-button" class="sample-btn flex gap-2 items-center">
+      <span class="material-icons">delete</span> Remove cached model
+    </button>
 
-    <script src="bundle/viewer.js"></script>
+  </div>
+</div>
+
+<!-- Right Panels -->
+<div class="absolute absolute bottom-16 right-2 z-30 flex flex-col gap-2 items-end">
+  <div id="palette-container"
+       class="hidden p-2 bg-white/30 rounded-xl shadow-xl">
+    <div class="colorjoe"></div>
+  </div>
+
+  <div id="properties-container"
+       class="hidden p-2 bg-white/30 rounded-xl shadow-xl max-w-[50vh] max-h-[50vh] overflow-y-auto">
+  </div>
+</div>
+
+<div class="fixed right-2 bottom-2 z-30 flex flex-row items-end gap-4">
+
+  <!-- Dimension Button -->
+  <button id="dim-button"
+          class="p-4 bg-white text-black rounded-full shadow-xl">
+    <span class="material-icons">straighten</span>
+  </button>
+
+  <!-- Palette Button -->
+  <button id="palette-button"
+          class="p-4 bg-white text-black rounded-full shadow-xl">
+    <span class="material-icons">palette</span>
+  </button>
+
+  <!-- Help Button Wrapper -->
+  <div class="relative">
+    <button id="guide-button"
+            class="p-4 bg-white text-black rounded-full shadow-xl">
+      <span class="material-icons">help</span>
+    </button>
+
+    <!-- Guide Card (now positioned relative to the Help button) -->
+    <div id="guide-container"
+         class="hidden absolute bottom-16 right-0 z-40 p-4 bg-white/30 rounded-xl shadow-2xl w-[300px]">
+
+      <table id="guide-table" class="table-fixed text-sm mt-8">
+        <tbody>
+          <tr><td class="font-semibold">Add clipping:</td><td>Click element + P</td></tr>
+          <tr><td class="font-semibold">Remove clipping:</td><td>Select arrow + O</td></tr>
+          <tr>
+            <td class="font-semibold">Measure:</td>
+            <td>Press Dimension → Double-click start → Click end</td>
+          </tr>
+          <tr><td class="font-semibold">Delete measure:</td><td>Select label + Del</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full flex justify-center z-20 pointer-events-none">
+  <div class="px-2 bg-neutral-200/70 text-xs">
+    Built with
+    <a href="https://ifcjs.github.io/info" target="_blank"
+       class="pointer-events-auto underline font-bold">IFC.js</a>
+    by vinay © 2025
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="bundle/viewer.js"></script>
+<script src="static/ui-events.js" defer></script>
+
+
 </body>
 </html>

@@ -126894,3 +126894,4 @@ window.onkeydown = (event) => {
         viewer.clipper.deletePlane();
     }
 };
+

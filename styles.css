@@ -12,3 +12,38 @@
     padding: 4px;
     border-radius: 4px;
 }
+
+/* -----------------------------------------
+   Base button styling : Left button
+   ----------------------------------------- */
+
+.sample-btn {
+  padding: 8px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  border: 0;
+  background-color: white;
+  box-shadow: rgb(0 0 0 / 5%) 0 0 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 15px;
+  transition: all 0.5s ease;
+}
+
+.sample-btn:hover {
+  letter-spacing: 3px;
+  background-color: hsl(240, 2%, 58%);
+  color: hsl(0, 0%, 100%);
+  box-shadow: rgb(214, 214, 214) 0px 7px 29px 0px;
+}
+
+.sample-btn:active {
+  letter-spacing: 3px;
+  background-color: hsl(261deg 80% 48%);
+  color: hsl(0, 0%, 100%);
+  box-shadow: rgb(93 24 220) 0px 0px 0px 0px;
+  transform: translateY(10px);
+  transition: 100ms;
+}
+
+
