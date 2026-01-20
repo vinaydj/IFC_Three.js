@@ -1,6 +1,10 @@
 # BIM-IFC Viewer
 
 Try it out: https://ifcview-vinay.netlify.app/
+<<<<<<< HEAD
+=======
+
+>>>>>>> f1ad06d (Local updates)
 
 ## Key Features
 
