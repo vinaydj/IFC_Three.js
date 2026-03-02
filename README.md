@@ -21,7 +21,7 @@ Get a free Mapbox API Key at (https://www.mapbox.com/)
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/helenkwok/bim-gis-viewer.git
+$ git clone https://github.com/vinaydj/IFC_Three.js
 
 # Go into the repository
 $ cd bim-gis-viewer
